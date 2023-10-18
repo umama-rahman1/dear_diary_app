@@ -3,16 +3,16 @@ import 'package:hive/hive.dart';
 part 'diary_entry_model.g.dart';
 
 @HiveType(typeId: 1)
-class DiaryEntryModel extends HiveObject {
+class DiaryEntry extends HiveObject {
   @HiveField(0)
-  String date;
+  final DateTime date;
 
   @HiveField(1)
-  String description;
+  final String description;
 
   @HiveField(2)
-  int rating;
+  final int rating;
 
-  DiaryEntryModel(
+  DiaryEntry(
       {required this.date, required this.description, required this.rating});
 }
