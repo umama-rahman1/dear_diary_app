@@ -10,9 +10,8 @@ import 'src/settings/settings_service.dart';
 void main() async {
   await Hive.initFlutter();
 
-  Hive.registerAdapter(DiaryEntryModelAdapter());
+  Hive.registerAdapter(DiaryEntryAdapter());
 
-  boxDiary = await Hive.openBox<DiaryEntryModel>('diaryBox');
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
   final settingsController = SettingsController(SettingsService());
