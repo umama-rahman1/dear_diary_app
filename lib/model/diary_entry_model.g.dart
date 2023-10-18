@@ -6,25 +6,25 @@ part of 'diary_entry_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DiaryEntryModelAdapter extends TypeAdapter<DiaryEntryModel> {
+class DiaryEntryAdapter extends TypeAdapter<DiaryEntry> {
   @override
   final int typeId = 1;
 
   @override
-  DiaryEntryModel read(BinaryReader reader) {
+  DiaryEntry read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return DiaryEntryModel(
-      date: fields[0] as String,
+    return DiaryEntry(
+      date: fields[0] as DateTime,
       description: fields[1] as String,
       rating: fields[2] as int,
     );
   }
 
   @override
-  void write(BinaryWriter writer, DiaryEntryModel obj) {
+  void write(BinaryWriter writer, DiaryEntry obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
@@ -41,7 +41,7 @@ class DiaryEntryModelAdapter extends TypeAdapter<DiaryEntryModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DiaryEntryModelAdapter &&
+      other is DiaryEntryAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
