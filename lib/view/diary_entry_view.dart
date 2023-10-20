@@ -1,7 +1,10 @@
+import 'package:dear_diary_app/view/diary_log_view.dart';
 import 'package:flutter/material.dart';
 import 'package:dear_diary_app/model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_controller.dart';
 import 'package:intl/intl.dart';
+
+DateTime now = DateTime.now();
 
 class DiaryEntryView extends StatefulWidget {
   @override
@@ -47,7 +50,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                       context: context,
                       initialDate: selectedDate,
                       firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
+                      lastDate: DateTime(now.year, now.month, now.day),
                     );
                     if (pickedDate != null && pickedDate != selectedDate) {
                       setState(() {
@@ -91,7 +94,9 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                 // Save the diary entry using the controller.
                 _diaryController.addDiaryEntry(entry);
                 Navigator.pop(
-                    context); // Return to the Diary Log View after saving.
+                  context,
+                  MaterialPageRoute(builder: (context) => DiaryLogView()),
+                ); // Return to the Diary Log View after saving.
               },
               child: Text('Save Entry'),
             ),
