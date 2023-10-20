@@ -2,7 +2,7 @@ import 'package:dear_diary_app/model/diary_entry_model.dart';
 import 'package:hive/hive.dart';
 
 class DiaryController {
-  final String _boxName = 'diary_entries';
+  final String _boxName = 'diaryEntries';
 
   Future<void> addDiaryEntry(DiaryEntry entry) async {
     final box = await Hive.openBox<DiaryEntry>(_boxName);

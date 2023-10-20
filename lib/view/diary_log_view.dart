@@ -48,6 +48,16 @@ class _DiaryLogViewState extends State<DiaryLogView> {
                 Text('Rating: ${entry.rating} stars'),
               ],
             ),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                // Remove the diary entry from the database.
+                _diaryController.removeDiaryEntry(entry.date);
+
+                // Refresh the diary entries.
+                _refreshDiaryEntries();
+              },
+            ),
           );
         },
       ),
@@ -62,13 +72,17 @@ class _DiaryLogViewState extends State<DiaryLogView> {
 
     if (result != null) {
       // If a result is received, refresh the diary entries.
-      setState(() {
-        diaryEntries = _diaryController.getAllDiaryEntries();
-      });
+      _refreshDiaryEntries();
 
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('$result')));
     }
+  }
+
+  void _refreshDiaryEntries() {
+    setState(() {
+      diaryEntries = _diaryController.getAllDiaryEntries();
+    });
   }
 }

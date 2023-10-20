@@ -11,7 +11,7 @@ void main() async {
 
   Hive.registerAdapter(DiaryEntryAdapter());
 
-  Box box = await Hive.openBox<DiaryEntry>('diary_entries');
+  Box box = await Hive.openBox<DiaryEntry>('diaryEntries');
 
   runApp(MaterialApp(
     title: 'Dear Diary App',
