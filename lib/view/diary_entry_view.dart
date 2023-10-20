@@ -95,7 +95,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                 _diaryController.addDiaryEntry(entry);
                 Navigator.pop(
                   context,
-                  MaterialPageRoute(builder: (context) => DiaryLogView()),
+                  'Entry Saved!',
                 ); // Return to the Diary Log View after saving.
               },
               child: Text('Save Entry'),
