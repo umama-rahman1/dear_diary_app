@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dear_diary_app/model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_controller.dart';
+import 'package:intl/intl.dart';
 
 class DiaryEntryView extends StatefulWidget {
   @override
@@ -29,6 +30,12 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
               decoration: InputDecoration(
                   labelText: 'Diary Text (140 characters or less)'),
               maxLength: 140,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
             ),
             SizedBox(height: 16.0),
             Row(
@@ -50,7 +57,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                   },
                   child: Text('Choose Date'),
                 ),
-                Text(selectedDate.toLocal().toString()),
+                Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal())),
               ],
             ),
             SizedBox(height: 16.0),
