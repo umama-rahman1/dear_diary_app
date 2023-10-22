@@ -42,7 +42,10 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
             const SizedBox(height: 16.0),
             Row(
               children: [
-                const Text('Select Date:'),
+                const Text('Select Date:',
+                    style: TextStyle(
+                      fontSize: 20,
+                    )),
                 TextButton(
                   onPressed: () async {
                     final pickedDate = await showDatePicker(
@@ -57,21 +60,33 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                       });
                     }
                   },
-                  child: const Text('Choose Date'),
+                  child: const Text('Choose Date',
+                      style: TextStyle(
+                        fontSize: 17,
+                      )),
                 ),
-                Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal())),
+                Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal()),
+                    style: TextStyle(
+                      fontSize: 17,
+                    )),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                const Text('Rating: '),
+                const Text('Rating: ',
+                    style: TextStyle(
+                      fontSize: 20,
+                    )),
                 DropdownButton<int>(
                   value: selectedRating,
                   items: List.generate(5, (index) {
                     return DropdownMenuItem<int>(
                       value: index + 1,
-                      child: Text((index + 1).toString()),
+                      child: Text((index + 1).toString(),
+                          style: TextStyle(
+                            fontSize: 17,
+                          )),
                     );
                   }),
                   onChanged: (value) {
