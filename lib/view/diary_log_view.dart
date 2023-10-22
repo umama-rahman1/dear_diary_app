@@ -49,13 +49,26 @@ class _DiaryLogViewState extends State<DiaryLogView> {
             return Column(
               children: <Widget>[
                 ListTile(
-                  title: Text(currentMonth),
+                  title: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(currentMonth,
+                        style: TextStyle(
+                          fontSize: 20, // Adjust the font size as needed
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ),
                 ),
                 _buildDiaryEntryTile(entry),
+                SizedBox(height: 8.0),
               ],
             );
           } else {
-            return _buildDiaryEntryTile(entry);
+            return Column(
+              children: <Widget>[
+                _buildDiaryEntryTile(entry),
+                SizedBox(height: 8.0), // Add space between entries
+              ],
+            );
           }
         },
       ),
@@ -63,24 +76,57 @@ class _DiaryLogViewState extends State<DiaryLogView> {
   }
 
   Widget _buildDiaryEntryTile(DiaryEntry entry) {
-    return ListTile(
-      title: Text(DateFormat('dd-MM-yyyy').format(entry.date)),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(entry.description),
-          Text('Rating: ${entry.rating} stars'),
-        ],
-      ),
-      trailing: IconButton(
-        icon: Icon(Icons.delete),
-        onPressed: () {
-          // Remove the diary entry from the database.
-          _diaryController.removeDiaryEntry(entry.date);
+    final starIcon = Icon(
+      Icons.star,
+      color: Colors.amber,
+    );
+    final ratingStars = Row(
+      children: List.generate(entry.rating, (index) => starIcon),
+    );
 
-          // Refresh the diary entries.
-          _refreshDiaryEntries();
-        },
+    return Card(
+      elevation: 4, // Add elevation for a card-like appearance
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.black, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0), // Add padding
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  DateFormat('E, MMM d').format(entry.date),
+                  style: TextStyle(
+                    fontSize: 17, // Adjust the font size as needed
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                ratingStars,
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    // Remove the diary entry from the database.
+                    _diaryController.removeDiaryEntry(entry.date);
+
+                    // Refresh the diary entries.
+                    _refreshDiaryEntries();
+                  },
+                ),
+              ],
+            ),
+            SizedBox(
+                height: 8.0), // Add space between date/rating and description
+            Text(
+              entry.description,
+              style: TextStyle(
+                fontSize: 15, // Adjust the font size as needed
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
