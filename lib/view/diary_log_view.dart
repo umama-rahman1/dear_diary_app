@@ -3,6 +3,7 @@ import 'package:dear_diary_app/model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_controller.dart';
 import 'package:dear_diary_app/view/diary_entry_view.dart';
 import 'package:intl/intl.dart';
+import 'diary_entry_edit_view.dart';
 
 class DiaryLogView extends StatefulWidget {
   const DiaryLogView({super.key});
@@ -134,60 +135,83 @@ class _DiaryLogViewState extends State<DiaryLogView> {
       children: List.generate(entry.rating, (index) => starIcon),
     );
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.black, width: 1),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+        onLongPress: () {
+          _navigateAndDisplayEdit(context, entry);
+        },
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: Colors.black, width: 1),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
               children: [
-                Text(
-                  DateFormat('E, MMM d').format(entry.date),
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('E, MMM d').format(entry.date),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    ratingStars,
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        try {
+                          await _diaryController.removeDiaryEntry(entry.date);
+                          _refreshDiaryEntries();
+                        } catch (error) {
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(
+                                SnackBar(content: Text(error.toString())));
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                ratingStars,
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () async {
-                    try {
-                      await _diaryController.removeDiaryEntry(entry.date);
-                      _refreshDiaryEntries();
-                    } catch (error) {
-                      ScaffoldMessenger.of(context)
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(
-                            SnackBar(content: Text(error.toString())));
-                    }
-                  },
+                SizedBox(height: 8.0),
+                Text(
+                  entry.description,
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 8.0),
-            Text(
-              entry.description,
-              style: TextStyle(
-                fontSize: 15,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Future<void> _navigateAndDisplaySubmission(BuildContext context) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DiaryEntryView()),
+    );
+
+    if (result != null) {
+      // If a result is received, refresh the diary entries.
+      _refreshDiaryEntries();
+
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$result')));
+    }
+  }
+
+  Future<void> _navigateAndDisplayEdit(
+      BuildContext context, DiaryEntry entry) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DiaryEntryEditView(editEntry: entry),
+      ),
     );
 
     if (result != null) {
