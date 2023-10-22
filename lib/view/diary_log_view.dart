@@ -16,7 +16,6 @@ class _DiaryLogViewState extends State<DiaryLogView> {
   late List<DiaryEntry> diaryEntries;
   String? selectedMonth;
   List<String> months = [
-    '',
     'January',
     'February',
     'March',
@@ -83,44 +82,47 @@ class _DiaryLogViewState extends State<DiaryLogView> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: diaryEntries.length,
-              itemBuilder: (context, index) {
-                final entry = diaryEntries[index];
-                final dateFormat = DateFormat('MMMM yyyy');
-                final currentMonth = dateFormat.format(entry.date);
-
-                if (index == 0 ||
-                    currentMonth !=
-                        dateFormat.format(diaryEntries[index - 1].date)) {
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        title: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(currentMonth,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              )),
-                        ),
-                      ),
-                      _buildDiaryEntryTile(entry),
-                      SizedBox(height: 8.0),
-                    ],
-                  );
-                } else {
-                  return Column(
-                    children: <Widget>[
-                      _buildDiaryEntryTile(entry),
-                      SizedBox(height: 8.0),
-                    ],
-                  );
-                }
-              },
-            ),
+            child: _buildEntriesListView(),
           )
         ]));
+  }
+
+  Widget _buildEntriesListView() {
+    return ListView.builder(
+      itemCount: diaryEntries.length,
+      itemBuilder: (context, index) {
+        final entry = diaryEntries[index];
+        final dateFormat = DateFormat('MMMM yyyy');
+        final currentMonth = dateFormat.format(entry.date);
+
+        if (index == 0 ||
+            currentMonth != dateFormat.format(diaryEntries[index - 1].date)) {
+          return Column(
+            children: <Widget>[
+              ListTile(
+                title: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(currentMonth,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+              ),
+              _buildDiaryEntryTile(entry),
+              SizedBox(height: 8.0),
+            ],
+          );
+        } else {
+          return Column(
+            children: <Widget>[
+              _buildDiaryEntryTile(entry),
+              SizedBox(height: 8.0),
+            ],
+          );
+        }
+      },
+    );
   }
 
   Widget _buildDiaryEntryTile(DiaryEntry entry) {
