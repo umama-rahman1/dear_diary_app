@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'diary_log_view.dart';
+import 'average_rating_view.dart';
 
 class WelcomePageView extends StatelessWidget {
   @override
@@ -30,6 +31,10 @@ class WelcomePageView extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 // Handle Show Average Rating of Months button click
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AverageRatingView()));
               },
               child: Text('Show Average Rating of Months',
                   style: TextStyle(fontSize: 18)),
