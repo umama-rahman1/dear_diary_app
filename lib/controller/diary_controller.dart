@@ -35,4 +35,14 @@ class DiaryController {
             element.date.month == month && element.date.year == year)
         .toList();
   }
+
+  Future<void> editDiaryEntry(DiaryEntry entry) async {
+    final box = await Hive.openBox<DiaryEntry>(_boxName);
+
+    if (box.containsKey(entry.date.toString())) {
+      await box.put(entry.date.toString(), entry);
+    } else {
+      throw Exception('Diary entry for this date does not exist.');
+    }
+  }
 }
