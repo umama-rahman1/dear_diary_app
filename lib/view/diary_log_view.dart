@@ -5,6 +5,8 @@ import 'package:dear_diary_app/view/diary_entry_view.dart';
 import 'package:intl/intl.dart';
 
 class DiaryLogView extends StatefulWidget {
+  const DiaryLogView({super.key});
+
   @override
   _DiaryLogViewState createState() => _DiaryLogViewState();
 }
@@ -16,10 +18,7 @@ class _DiaryLogViewState extends State<DiaryLogView> {
   @override
   void initState() {
     super.initState();
-    // Load diary entries when the view is initialized
-    diaryEntries = _diaryController.getAllDiaryEntries();
-    // Sort the entries in reverse chronological order
-    diaryEntries.sort((a, b) => b.date.compareTo(a.date));
+    _refreshDiaryEntries();
   }
 
   @override
@@ -31,7 +30,6 @@ class _DiaryLogViewState extends State<DiaryLogView> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              // Navigate to the Diary Entry View when the "+" icon is pressed.
               _navigateAndDisplaySubmission(context);
             },
           ),
@@ -53,7 +51,7 @@ class _DiaryLogViewState extends State<DiaryLogView> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(currentMonth,
                         style: TextStyle(
-                          fontSize: 20, // Adjust the font size as needed
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         )),
                   ),
@@ -66,7 +64,7 @@ class _DiaryLogViewState extends State<DiaryLogView> {
             return Column(
               children: <Widget>[
                 _buildDiaryEntryTile(entry),
-                SizedBox(height: 8.0), // Add space between entries
+                SizedBox(height: 8.0),
               ],
             );
           }
@@ -85,13 +83,13 @@ class _DiaryLogViewState extends State<DiaryLogView> {
     );
 
     return Card(
-      elevation: 4, // Add elevation for a card-like appearance
+      elevation: 4,
       shape: RoundedRectangleBorder(
         side: BorderSide(color: Colors.black, width: 1),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0), // Add padding
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Row(
@@ -100,7 +98,7 @@ class _DiaryLogViewState extends State<DiaryLogView> {
                 Text(
                   DateFormat('E, MMM d').format(entry.date),
                   style: TextStyle(
-                    fontSize: 17, // Adjust the font size as needed
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -108,21 +106,17 @@ class _DiaryLogViewState extends State<DiaryLogView> {
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    // Remove the diary entry from the database.
                     _diaryController.removeDiaryEntry(entry.date);
-
-                    // Refresh the diary entries.
                     _refreshDiaryEntries();
                   },
                 ),
               ],
             ),
-            SizedBox(
-                height: 8.0), // Add space between date/rating and description
+            SizedBox(height: 8.0),
             Text(
               entry.description,
               style: TextStyle(
-                fontSize: 15, // Adjust the font size as needed
+                fontSize: 15,
               ),
             ),
           ],
