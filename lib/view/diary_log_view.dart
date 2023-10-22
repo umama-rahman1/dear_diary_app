@@ -14,6 +14,21 @@ class DiaryLogView extends StatefulWidget {
 class _DiaryLogViewState extends State<DiaryLogView> {
   final DiaryController _diaryController = DiaryController();
   late List<DiaryEntry> diaryEntries;
+  String? selectedMonth;
+  List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
 
   @override
   void initState() {
@@ -24,52 +39,89 @@ class _DiaryLogViewState extends State<DiaryLogView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Diary Log'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              _navigateAndDisplaySubmission(context);
-            },
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: diaryEntries.length,
-        itemBuilder: (context, index) {
-          final entry = diaryEntries[index];
-          final dateFormat = DateFormat('MMMM yyyy');
-          final currentMonth = dateFormat.format(entry.date);
-
-          if (index == 0 ||
-              currentMonth != dateFormat.format(diaryEntries[index - 1].date)) {
-            return Column(
+        appBar: AppBar(
+          title: Text('Diary Log'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                _navigateAndDisplaySubmission(context);
+              },
+            ),
+          ],
+        ),
+        body: Column(children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                ListTile(
-                  title: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(currentMonth,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )),
+                Text(
+                  "Filter by month",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                _buildDiaryEntryTile(entry),
-                SizedBox(height: 8.0),
+                DropdownButton<String>(
+                  value: selectedMonth,
+                  items: months.map((String month) {
+                    return DropdownMenuItem<String>(
+                      value: month,
+                      child: Text(month),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMonth = newValue;
+                      _refreshDiaryEntries();
+                    });
+                  },
+                ),
               ],
-            );
-          } else {
-            return Column(
-              children: <Widget>[
-                _buildDiaryEntryTile(entry),
-                SizedBox(height: 8.0),
-              ],
-            );
-          }
-        },
-      ),
+            ),
+          ),
+          Expanded(
+            child: _buildEntriesListView(),
+          )
+        ]));
+  }
+
+  Widget _buildEntriesListView() {
+    return ListView.builder(
+      itemCount: diaryEntries.length,
+      itemBuilder: (context, index) {
+        final entry = diaryEntries[index];
+        final dateFormat = DateFormat('MMMM yyyy');
+        final currentMonth = dateFormat.format(entry.date);
+
+        if (index == 0 ||
+            currentMonth != dateFormat.format(diaryEntries[index - 1].date)) {
+          return Column(
+            children: <Widget>[
+              ListTile(
+                title: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(currentMonth,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+              ),
+              _buildDiaryEntryTile(entry),
+              SizedBox(height: 8.0),
+            ],
+          );
+        } else {
+          return Column(
+            children: <Widget>[
+              _buildDiaryEntryTile(entry),
+              SizedBox(height: 8.0),
+            ],
+          );
+        }
+      },
     );
   }
 
@@ -150,7 +202,15 @@ class _DiaryLogViewState extends State<DiaryLogView> {
 
   void _refreshDiaryEntries() {
     setState(() {
-      diaryEntries = _diaryController.getAllDiaryEntries();
+      List<DiaryEntry> allEntries = _diaryController.getAllDiaryEntries();
+      if (selectedMonth != null) {
+        diaryEntries = allEntries.where((entry) {
+          final dateFormat = DateFormat('MMMM');
+          return dateFormat.format(entry.date) == selectedMonth;
+        }).toList();
+      } else {
+        diaryEntries = allEntries;
+      }
       diaryEntries.sort((a, b) => b.date.compareTo(a.date));
     });
   }

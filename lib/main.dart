@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'view/diary_log_view.dart';
+import 'view/welcome_page_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,6 @@ void main() async {
   runApp(MaterialApp(
     title: 'Dear Diary App',
     theme: appTheme,
-    home: DiaryLogView(),
+    home: WelcomePageView(),
   ));
 }
