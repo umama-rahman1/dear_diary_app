@@ -24,7 +24,7 @@ class WelcomePageView extends StatelessWidget {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => DiaryLogView()));
               },
-              child: Text('Filter by Months', style: TextStyle(fontSize: 18)),
+              child: Text('Default List View', style: TextStyle(fontSize: 18)),
             ),
             SizedBox(height: 10),
             ElevatedButton(
