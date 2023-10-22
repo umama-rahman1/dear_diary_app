@@ -18,6 +18,8 @@ class _DiaryLogViewState extends State<DiaryLogView> {
     super.initState();
     // Load diary entries when the view is initialized
     diaryEntries = _diaryController.getAllDiaryEntries();
+    // Sort the entries in reverse chronological order
+    diaryEntries.sort((a, b) => b.date.compareTo(a.date));
   }
 
   @override
@@ -83,6 +85,7 @@ class _DiaryLogViewState extends State<DiaryLogView> {
   void _refreshDiaryEntries() {
     setState(() {
       diaryEntries = _diaryController.getAllDiaryEntries();
+      diaryEntries.sort((a, b) => b.date.compareTo(a.date));
     });
   }
 }
