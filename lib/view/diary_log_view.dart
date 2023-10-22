@@ -41,26 +41,45 @@ class _DiaryLogViewState extends State<DiaryLogView> {
         itemCount: diaryEntries.length,
         itemBuilder: (context, index) {
           final entry = diaryEntries[index];
-          return ListTile(
-            title: Text(DateFormat('dd-MM-yyyy').format(entry.date)),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(entry.description),
-                Text('Rating: ${entry.rating} stars'),
-              ],
-            ),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                // Remove the diary entry from the database.
-                _diaryController.removeDiaryEntry(entry.date);
+          final dateFormat = DateFormat('MMMM yyyy');
+          final currentMonth = dateFormat.format(entry.date);
 
-                // Refresh the diary entries.
-                _refreshDiaryEntries();
-              },
-            ),
-          );
+          if (index == 0 ||
+              currentMonth != dateFormat.format(diaryEntries[index - 1].date)) {
+            return Column(
+              children: <Widget>[
+                ListTile(
+                  title: Text(currentMonth),
+                ),
+                _buildDiaryEntryTile(entry),
+              ],
+            );
+          } else {
+            return _buildDiaryEntryTile(entry);
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildDiaryEntryTile(DiaryEntry entry) {
+    return ListTile(
+      title: Text(DateFormat('dd-MM-yyyy').format(entry.date)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(entry.description),
+          Text('Rating: ${entry.rating} stars'),
+        ],
+      ),
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () {
+          // Remove the diary entry from the database.
+          _diaryController.removeDiaryEntry(entry.date);
+
+          // Refresh the diary entries.
+          _refreshDiaryEntries();
         },
       ),
     );
