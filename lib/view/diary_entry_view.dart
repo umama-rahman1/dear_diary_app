@@ -1,4 +1,3 @@
-import 'package:dear_diary_app/view/diary_log_view.dart';
 import 'package:flutter/material.dart';
 import 'package:dear_diary_app/model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_controller.dart';
@@ -21,7 +20,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Diary Entry'),
+        title: const Text('Add Diary Entry'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -30,7 +29,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
           children: [
             TextFormField(
               controller: diaryTextController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   labelText: 'Diary Text (140 characters or less)'),
               maxLength: 140,
               validator: (value) {
@@ -40,10 +39,10 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                 return null;
               },
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Row(
               children: [
-                Text('Select Date:'),
+                const Text('Select Date:'),
                 TextButton(
                   onPressed: () async {
                     final pickedDate = await showDatePicker(
@@ -58,15 +57,15 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                       });
                     }
                   },
-                  child: Text('Choose Date'),
+                  child: const Text('Choose Date'),
                 ),
                 Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal())),
               ],
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Row(
               children: [
-                Text('Rating: '),
+                const Text('Rating: '),
                 DropdownButton<int>(
                   value: selectedRating,
                   items: List.generate(5, (index) {
@@ -83,7 +82,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                 ),
               ],
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
                 final entry = DiaryEntry(
@@ -92,14 +91,12 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                   rating: selectedRating,
                 );
                 try {
-                  // Save the diary entry using the controller.
                   await _diaryController.addDiaryEntry(entry);
                   Navigator.pop(
                     context,
                     'Entry Saved!',
                   ); // Return to the Diary Log View after saving.
                 } catch (e) {
-                  //Show the error as a Snackbar using scaffold messenger showSnackBar method.
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(e.toString()),
@@ -107,7 +104,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                   );
                 }
               },
-              child: Text('Save Entry'),
+              child: const Text('Save Entry'),
             ),
           ],
         ),
