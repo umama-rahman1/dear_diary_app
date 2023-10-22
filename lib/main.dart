@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'view/diary_log_view.dart';
-import 'package:dear_diary_app/controller/diary_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +12,7 @@ void main() async {
 
   Box box = await Hive.openBox<DiaryEntry>('diaryEntries');
 
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     title: 'Dear Diary App',
     home: DiaryLogView(),
   ));
