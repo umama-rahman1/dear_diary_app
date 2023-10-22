@@ -105,9 +105,16 @@ class _DiaryLogViewState extends State<DiaryLogView> {
                 ratingStars,
                 IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () {
-                    _diaryController.removeDiaryEntry(entry.date);
-                    _refreshDiaryEntries();
+                  onPressed: () async {
+                    try {
+                      await _diaryController.removeDiaryEntry(entry.date);
+                      _refreshDiaryEntries();
+                    } catch (error) {
+                      ScaffoldMessenger.of(context)
+                        ..removeCurrentSnackBar()
+                        ..showSnackBar(
+                            SnackBar(content: Text(error.toString())));
+                    }
                   },
                 ),
               ],
