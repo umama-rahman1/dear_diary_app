@@ -85,18 +85,27 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final entry = DiaryEntry(
                   date: selectedDate,
                   description: diaryTextController.text,
                   rating: selectedRating,
                 );
-                // Save the diary entry using the controller.
-                _diaryController.addDiaryEntry(entry);
-                Navigator.pop(
-                  context,
-                  'Entry Saved!',
-                ); // Return to the Diary Log View after saving.
+                try {
+                  // Save the diary entry using the controller.
+                  await _diaryController.addDiaryEntry(entry);
+                  Navigator.pop(
+                    context,
+                    'Entry Saved!',
+                  ); // Return to the Diary Log View after saving.
+                } catch (e) {
+                  //Show the error as a Snackbar using scaffold messenger showSnackBar method.
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                    ),
+                  );
+                }
               },
               child: Text('Save Entry'),
             ),
