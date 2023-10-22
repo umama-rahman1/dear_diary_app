@@ -166,6 +166,10 @@ class _DiaryLogViewState extends State<DiaryLogView> {
                         try {
                           await _diaryController.removeDiaryEntry(entry.date);
                           _refreshDiaryEntries();
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(SnackBar(
+                                content: Text("Successfully deleted entry!")));
                         } catch (error) {
                           ScaffoldMessenger.of(context)
                             ..removeCurrentSnackBar()
