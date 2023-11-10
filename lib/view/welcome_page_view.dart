@@ -18,8 +18,6 @@ class WelcomePageView extends StatelessWidget {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const DiaryLoginView()));
             },
           ),
         ],
