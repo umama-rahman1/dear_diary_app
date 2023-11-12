@@ -83,6 +83,7 @@ class DiaryEntryService {
         .where('date',
             isGreaterThanOrEqualTo: firstDayOfMonth,
             isLessThanOrEqualTo: lastDayOfMonth)
+        .orderBy('date', descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
