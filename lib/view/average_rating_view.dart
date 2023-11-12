@@ -50,41 +50,49 @@ class _AverageRatingViewState extends State<AverageRatingView> {
       appBar: AppBar(
         title: Text('Average Star Ratings by Month'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: BarChart(
-          BarChartData(
-            barGroups: sortedMonths.map((month) {
-              final averageRating = averageRatings[month] ?? 0.0;
-              return BarChartGroupData(
-                x: sortedMonths.indexOf(month),
-                barRods: [
-                  BarChartRodData(
-                    y: averageRating,
-                    colors: [Colors.blue],
-                    width: 20.0,
-                    borderRadius: BorderRadius.circular(5),
+      body: Column(
+        children: [
+          SizedBox(height: 35.0), // Add desired height above the chart
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: BarChart(
+                BarChartData(
+                  barGroups: sortedMonths.map((month) {
+                    final averageRating = averageRatings[month] ?? 0.0;
+                    return BarChartGroupData(
+                      x: sortedMonths.indexOf(month),
+                      barRods: [
+                        BarChartRodData(
+                          y: averageRating,
+                          colors: [Colors.blue],
+                          width: 20.0,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ],
+                      showingTooltipIndicators: [0],
+                    );
+                  }).toList(),
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(showTitles: true),
+                    bottomTitles: SideTitles(
+                      showTitles: true,
+                      getTitles: (double value) {
+                        if (value.toInt() < 0 ||
+                            value.toInt() >= sortedMonths.length) {
+                          return '';
+                        }
+                        return sortedMonths[value.toInt()];
+                      },
+                    ),
+                    topTitles: SideTitles(showTitles: false), // Hide top titles
                   ),
-                ],
-                showingTooltipIndicators: [0],
-              );
-            }).toList(),
-            titlesData: FlTitlesData(
-              leftTitles: SideTitles(showTitles: true),
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTitles: (double value) {
-                  if (value.toInt() < 0 ||
-                      value.toInt() >= sortedMonths.length) {
-                    return '';
-                  }
-                  return sortedMonths[value.toInt()];
-                },
+                  borderData: FlBorderData(show: true),
+                ),
               ),
             ),
-            borderData: FlBorderData(show: true),
           ),
-        ),
+        ],
       ),
     );
   }
