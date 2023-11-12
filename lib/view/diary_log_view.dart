@@ -137,7 +137,7 @@ class _DiaryLogViewState extends State<DiaryLogView> {
 
     return GestureDetector(
         onLongPress: () {
-          _navigateAndDisplayEdit(context, entry);
+          // _navigateAndDisplayEdit(context, entry);
         },
         child: Card(
           elevation: 4,
@@ -209,24 +209,24 @@ class _DiaryLogViewState extends State<DiaryLogView> {
     }
   }
 
-  Future<void> _navigateAndDisplayEdit(
-      BuildContext context, DiaryEntry entry) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DiaryEntryEditView(editEntry: entry),
-      ),
-    );
+  // Future<void> _navigateAndDisplayEdit(
+  //     BuildContext context, DiaryEntry entry) async {
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => DiaryEntryEditView(editEntry: entry),
+  //     ),
+  //   );
 
-    if (result != null) {
-      // If a result is received, refresh the diary entries.
-      _refreshDiaryEntries();
+  //   if (result != null) {
+  //     // If a result is received, refresh the diary entries.
+  //     _refreshDiaryEntries();
 
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text('$result')));
-    }
-  }
+  //     ScaffoldMessenger.of(context)
+  //       ..removeCurrentSnackBar()
+  //       ..showSnackBar(SnackBar(content: Text('$result')));
+  //   }
+  // }
 
   void _refreshDiaryEntries() {
     setState(() {

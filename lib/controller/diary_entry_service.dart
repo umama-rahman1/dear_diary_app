@@ -53,7 +53,18 @@ class DiaryEntryService {
     if (user == null) {
       throw Exception('You must be logged in to update a diary entry.');
     }
-    return await diaryEntriesCollection.doc(entry.id).update(entry.toMap());
+
+    // Check if an entry with the same date already exists
+    QuerySnapshot<Object?> existingEntries =
+        await diaryEntriesCollection.where('date', isEqualTo: entry.date).get();
+
+    if (existingEntries.docs.isNotEmpty) {
+      // If an entry with the same date exists, update its content
+      return await existingEntries.docs.first.reference.update(entry.toMap());
+    } else {
+      // If no entry with the same date exists, throw an error
+      throw Exception('Diary Entry for this date does not exist.');
+    }
   }
 
   // Retrieves a stream of a list of 'DiaryEntry' objects for the current user.
