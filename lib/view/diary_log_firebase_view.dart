@@ -110,6 +110,15 @@ class _DiaryLogViewState extends State<DiaryLogFirebaseView> {
   }
 
   Widget _buildEntriesListView(List<DiaryEntry> diaryEntries) {
+    if (diaryEntries.isEmpty) {
+      return const Center(
+          child: Text(
+        'No diary entries',
+        style: TextStyle(
+          fontSize: 24,
+        ),
+      ));
+    }
     return ListView.builder(
       itemCount: diaryEntries.length,
       itemBuilder: (context, index) {
