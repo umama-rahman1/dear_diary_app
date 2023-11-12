@@ -77,11 +77,21 @@ class DiaryEntryService {
         DateTime(year, month + 1, 1).subtract(Duration(days: 1));
 
     return diaryEntriesCollection
-        .where('timestamp',
+        .where('date',
             isGreaterThanOrEqualTo: firstDayOfMonth,
             isLessThanOrEqualTo: lastDayOfMonth)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiaryEntry.fromMap(doc)).toList());
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        return DiaryEntry(
+          id: doc.id,
+          date: data['date'].toDate(),
+          description: data['description'] ?? '',
+          rating: data['rating'] ?? 0,
+        );
+      }).toList();
+    });
   }
 }

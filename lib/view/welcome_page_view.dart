@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'diary_log_view.dart';
+// import 'diary_log_view.dart';
 import 'average_rating_view.dart';
-import 'package:dear_diary_app/view/auth_ui/diary_login_view.dart';
+import 'diary_log_firebase_view.dart';
 
 class WelcomePageView extends StatelessWidget {
   const WelcomePageView({super.key});
@@ -38,7 +38,8 @@ class WelcomePageView extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const DiaryLogView()));
+                        // builder: (context) => const DiaryLogView()));
+                        builder: (context) => DiaryLogFirebaseView()));
               },
               child: const Text('Default List View',
                   style: TextStyle(fontSize: 18)),

@@ -1,170 +1,265 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'diary_entry_view.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_entry_service.dart';
+import 'package:dear_diary_app/view/diary_entry_view.dart';
+import 'package:intl/intl.dart';
+import 'diary_entry_edit_view.dart';
 
-class DiaryLogFirebaseView extends StatelessWidget {
-  DiaryLogFirebaseView({Key? key}) : super(key: key);
+class DiaryLogFirebaseView extends StatefulWidget {
+  const DiaryLogFirebaseView({super.key});
 
-  // Instance of DiaryEntryService to interact with Firestore for CRUD operations on diary entries.
-  final DiaryEntryService diaryEntryService = DiaryEntryService();
+  @override
+  _DiaryLogViewState createState() => _DiaryLogViewState();
+}
+
+class _DiaryLogViewState extends State<DiaryLogFirebaseView> {
+  final DiaryEntryService _diaryEntryService = DiaryEntryService();
+  late Stream<List<DiaryEntry>> diaryEntriesStream;
+  String? selectedMonth;
+  List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshDiaryEntries();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // App bar with a title and a logout button.
       appBar: AppBar(
-        title: Text("Dear Diary"),
+        title: Text('Diary Log'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
-            // Sign out the user on pressing the logout button.
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
+            icon: Icon(Icons.add),
+            onPressed: () {
+              _navigateAndDisplaySubmission(context);
             },
           ),
         ],
       ),
-      // Body of the widget using a StreamBuilder to listen for changes
-      // in the diary entries collection and reflect them in the UI in real-time.
-      body: StreamBuilder<List<DiaryEntry>>(
-        stream: diaryEntryService.getUsersDiaryEntries(),
-        builder: (context, snapshot) {
-          // Show a loading indicator until data is fetched from Firestore.
-          if (!snapshot.hasData) return CircularProgressIndicator();
-          final entries = snapshot.data!;
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Filter by month",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                DropdownButton<String>(
+                  value: selectedMonth,
+                  items: months.map((String month) {
+                    return DropdownMenuItem<String>(
+                      value: month,
+                      child: Text(month),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMonth = newValue;
+                      _refreshDiaryEntries();
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<List<DiaryEntry>>(
+              stream: diaryEntriesStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                }
 
-          // Build a list of diary entries using ListView.builder.
-          return ListView.builder(
-            itemCount: entries.length,
-            itemBuilder: (context, index) {
-              final entry = entries[index];
-              // Display each diary entry's date, title, and content.
-              return ListTile(
-                title: Text(entry.date.toString()),
-                subtitle: Text(entry.description),
-                onTap: () {
-                  // TODO: Handle tapping on a diary entry to view details.
-                },
-                // TODO: In the future, edit and delete buttons can be added here.
-              );
-            },
-          );
-        },
-      ),
-      // Floating action button to open a dialog for adding a new diary entry.
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Display the AddDiaryEntryDialog when the button is pressed.
-          showDialog(
-            context: context,
-            builder: (context) => DiaryEntryView(),
-          );
-        },
-        child: Icon(Icons.add),
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                final diaryEntries = snapshot.data!;
+                return _buildEntriesListView(diaryEntries);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildEntriesListView(List<DiaryEntry> diaryEntries) {
+    return ListView.builder(
+      itemCount: diaryEntries.length,
+      itemBuilder: (context, index) {
+        final entry = diaryEntries[index];
+        final dateFormat = DateFormat('MMMM yyyy');
+        final currentMonth = dateFormat.format(entry.date);
+
+        if (index == 0 ||
+            currentMonth != dateFormat.format(diaryEntries[index - 1].date)) {
+          return Column(
+            children: <Widget>[
+              ListTile(
+                title: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(currentMonth,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+              ),
+              _buildDiaryEntryTile(entry),
+              SizedBox(height: 8.0),
+            ],
+          );
+        } else {
+          return Column(
+            children: <Widget>[
+              _buildDiaryEntryTile(entry),
+              SizedBox(height: 8.0),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildDiaryEntryTile(DiaryEntry entry) {
+    final starIcon = Icon(
+      Icons.star,
+      color: Colors.amber,
+    );
+    final ratingStars = Row(
+      children: List.generate(entry.rating, (index) => starIcon),
+    );
+
+    return GestureDetector(
+      onLongPress: () {
+        //_navigateAndDisplayEdit(context, entry);
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    DateFormat('E, MMM d').format(entry.date),
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  ratingStars,
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () async {
+                      try {
+                        await _diaryEntryService.removeDiaryEntry(entry.date);
+                        _refreshDiaryEntries();
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(SnackBar(
+                              content: Text("Successfully deleted entry!")));
+                      } catch (error) {
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                              SnackBar(content: Text(error.toString())));
+                      }
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.0),
+              Text(
+                entry.description,
+                style: TextStyle(
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _navigateAndDisplaySubmission(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DiaryEntryView()),
+    );
+
+    if (result != null) {
+      // If a result is received, refresh the diary entries.
+      _refreshDiaryEntries();
+
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$result')));
+    }
+  }
+
+  // Future<void> _navigateAndDisplayEdit(
+  //     BuildContext context, DiaryEntry entry) async {
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => DiaryEntryEditView(editEntry: entry),
+  //     ),
+  //   );
+
+  //   if (result != null) {
+  //     // If a result is received, refresh the diary entries.
+  //     _refreshDiaryEntries();
+
+  //     ScaffoldMessenger.of(context)
+  //       ..removeCurrentSnackBar()
+  //       ..showSnackBar(SnackBar(content: Text('$result')));
+  //   }
+  // }
+
+  void _refreshDiaryEntries() {
+    setState(() {
+      if (selectedMonth != null) {
+        diaryEntriesStream = _diaryEntryService.getEntriesForMonth(
+          months.indexOf(selectedMonth!) + 1,
+          DateTime.now().year,
+        );
+      } else {
+        diaryEntriesStream = _diaryEntryService.getUsersDiaryEntries();
+      }
+    });
+  }
 }
-
-
-// import 'package:flutter/material.dart';
-// import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
-// import 'package:dear_diary_app/controller/diary_entry_service.dart';
-
-// class DiaryLogView extends StatelessWidget {
-//   final DiaryEntryService diaryEntryService = DiaryEntryService();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Diary Log'),
-//       ),
-//       body: StreamBuilder<List<DiaryEntry>>(
-//         stream: diaryEntryService.getUsersDiaryEntries(),
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return Center(
-//               child: CircularProgressIndicator(),
-//             );
-//           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-//             return Center(
-//               child: Text('No diary entries found.'),
-//             );
-//           } else {
-//             return ListView.builder(
-//               itemCount: snapshot.data!.length,
-//               itemBuilder: (context, index) {
-//                 return DiaryEntryCard(
-//                   diaryEntry: snapshot.data![index],
-//                   onDelete: () {
-//                     // Handle onDelete if needed
-//                     // For example, you can show a confirmation dialog
-//                     // and then call diaryEntryService.removeDiaryEntry
-//                     // to delete the entry from Firestore.
-//                   },
-//                 );
-//               },
-//             );
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
-
-// class DiaryEntryCard extends StatelessWidget {
-//   final DiaryEntry diaryEntry;
-//   final VoidCallback onDelete;
-
-//   DiaryEntryCard({required this.diaryEntry, required this.onDelete});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Dismissible(
-//       key: Key(diaryEntry.id!),
-//       onDismissed: (_) {
-//         onDelete();
-//       },
-//       background: Container(
-//         color: Colors.red,
-//         child: Icon(
-//           Icons.delete,
-//           color: Colors.white,
-//         ),
-//         alignment: Alignment.centerRight,
-//         padding: EdgeInsets.only(right: 16.0),
-//       ),
-//       child: Card(
-//         margin: EdgeInsets.all(8.0),
-//         child: ListTile(
-//           title: Text(
-//             'Date: ${diaryEntry.date.toLocal()}',
-//             style: TextStyle(fontWeight: FontWeight.bold),
-//           ),
-//           subtitle: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Text('Description: ${diaryEntry.description}'),
-//               Text('Rating: ${diaryEntry.rating}'),
-//             ],
-//           ),
-//           onTap: () {
-//             // Handle onTap if needed
-//           },
-//           onLongPress: () {
-//             // Handle onLongPress if needed
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// void main() {
-//   runApp(MaterialApp(
-//     home: DiaryLogView(),
-//   ));
-// }
