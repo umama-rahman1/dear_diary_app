@@ -51,7 +51,10 @@ class DiaryEntryService {
       throw Exception('You must be logged in to view diary entries.');
     }
 
-    return diaryEntriesCollection.snapshots().map((snapshot) {
+    return diaryEntriesCollection
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
