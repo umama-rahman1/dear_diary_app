@@ -19,7 +19,18 @@ class DiaryEntryService {
     if (user == null) {
       throw Exception('You must be logged in to add a diary entry.');
     }
-    return await diaryEntriesCollection.add(entry.toMap());
+
+    // Check if an entry with the same date already exists
+    QuerySnapshot<Object?> existingEntries =
+        await diaryEntriesCollection.where('date', isEqualTo: entry.date).get();
+
+    if (existingEntries.docs.isEmpty) {
+      // Add the entry if no entry with the same date exists
+      return await diaryEntriesCollection.add(entry.toMap());
+    } else {
+      // Throw an error if an entry with the same date exists
+      throw Exception('Diary Entry for this date already exists.');
+    }
   }
 
   /// Removes a diary entry from Firestore. removing based on date
