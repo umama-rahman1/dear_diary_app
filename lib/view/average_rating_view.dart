@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:dear_diary_app/model/diary_entry_model.dart';
-import 'package:dear_diary_app/controller/diary_controller.dart';
+import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
+import 'package:dear_diary_app/controller/diary_entry_service.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class AverageRatingView extends StatefulWidget {
   @override
@@ -9,55 +10,98 @@ class AverageRatingView extends StatefulWidget {
 }
 
 class _AverageRatingViewState extends State<AverageRatingView> {
-  final DiaryController _diaryController = DiaryController();
-  late List<DiaryEntry> diaryEntries;
+  final DiaryEntryService _diaryEntryService = DiaryEntryService();
+  late Stream<List<DiaryEntry>> diaryEntriesStream;
   Map<String, double> averageRatings = {};
 
   @override
   void initState() {
     super.initState();
+    diaryEntriesStream = _diaryEntryService.getUsersDiaryEntries();
     _calculateAverageRatings();
   }
 
   void _calculateAverageRatings() {
-    // Retrieve all diary entries
-    diaryEntries = _diaryController.getAllDiaryEntries();
+    diaryEntriesStream.listen((List<DiaryEntry> entries) {
+      // Calculate average ratings for each month
+      for (var entry in entries) {
+        final dateFormat = DateFormat('yyyy-MM');
+        final month = dateFormat.format(entry.date);
+        final rating = entry.rating;
 
-    // Calculate average ratings for each month
-    for (var entry in diaryEntries) {
-      final dateFormat = DateFormat('yyyy-MM');
-      final month = dateFormat.format(entry.date);
-      if (averageRatings.containsKey(month)) {
-        averageRatings[month] = (averageRatings[month]! + entry.rating) / 2.0;
-      } else {
-        averageRatings[month] = entry.rating.toDouble();
+        // Check if rating is a finite number and not NaN
+        if (rating.isFinite && !rating.isNaN) {
+          if (averageRatings.containsKey(month)) {
+            // Check if the new value is finite before updating
+            final newAverage = (averageRatings[month]! + rating) / 2.0;
+            if (newAverage.isFinite) {
+              averageRatings[month] = newAverage;
+            }
+          } else {
+            averageRatings[month] = rating.toDouble();
+          }
+        }
       }
-    }
+
+      // Update the UI
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final sortedMonths = averageRatings.keys.toList()..sort((a, b) => b.compareTo(a));
+    final sortedMonths = averageRatings.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Average Star Ratings by Month'),
       ),
-      body: ListView.builder(
-        itemCount: sortedMonths.length,
-        itemBuilder: (context, index) {
-          final month = sortedMonths[index];
-          final averageRating = averageRatings[month];
-
-          final formattedMonth = DateFormat('MMMM yyyy').format(DateFormat('yyyy-MM').parse(month));
-
-          return ListTile(
-            title: Text(
-              'Average Rating for $formattedMonth = ${averageRating?.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 20),
+      body: Column(
+        children: [
+          SizedBox(height: 35.0), // Add desired height above the chart
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: BarChart(
+                BarChartData(
+                  barGroups: sortedMonths.map((month) {
+                    final averageRating = averageRatings[month] ?? 0.0;
+                    return BarChartGroupData(
+                      x: sortedMonths.indexOf(month),
+                      barRods: [
+                        BarChartRodData(
+                          y: averageRating,
+                          colors: [Colors.blue],
+                          width: 20.0,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ],
+                      showingTooltipIndicators: [0],
+                    );
+                  }).toList(),
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(showTitles: true),
+                    bottomTitles: SideTitles(
+                      showTitles: true,
+                      getTitles: (double value) {
+                        if (value.toInt() < 0 ||
+                            value.toInt() >= sortedMonths.length) {
+                          return '';
+                        }
+                        return sortedMonths[value.toInt()];
+                      },
+                    ),
+                    topTitles: SideTitles(showTitles: false), // Hide top titles
+                  ),
+                  borderData: FlBorderData(show: true),
+                ),
+              ),
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
