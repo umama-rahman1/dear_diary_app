@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:dear_diary_app/model/diary_entry_model.dart';
-import 'package:dear_diary_app/controller/diary_controller.dart';
+// import 'package:dear_diary_app/model/diary_entry_model.dart';
+import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
+// import 'package:dear_diary_app/controller/diary_controller.dart';
+import 'package:dear_diary_app/controller/diary_entry_service.dart';
 import 'package:intl/intl.dart';
 
 DateTime now = DateTime.now();
@@ -11,7 +13,8 @@ class DiaryEntryView extends StatefulWidget {
 }
 
 class _DiaryEntryViewState extends State<DiaryEntryView> {
-  final DiaryController _diaryController = DiaryController();
+  // final DiaryController _diaryController = DiaryController();
+  final DiaryEntryService _diaryEntryService = DiaryEntryService();
   DateTime selectedDate = DateTime.now();
   int selectedRating = 5;
   final TextEditingController diaryTextController = TextEditingController();
@@ -106,7 +109,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                   rating: selectedRating,
                 );
                 try {
-                  await _diaryController.addDiaryEntry(entry);
+                  await _diaryEntryService.addDiaryEntry(entry);
                   Navigator.pop(
                     context,
                     'Entry Saved!',

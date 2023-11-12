@@ -19,16 +19,32 @@ class DiaryEntryService {
     if (user == null) {
       throw Exception('You must be logged in to add a diary entry.');
     }
-    return await diaryEntriesCollection.add(entry.toMap());
+
+    // Check if an entry with the same date already exists
+    QuerySnapshot<Object?> existingEntries =
+        await diaryEntriesCollection.where('date', isEqualTo: entry.date).get();
+
+    if (existingEntries.docs.isEmpty) {
+      // Add the entry if no entry with the same date exists
+      return await diaryEntriesCollection.add(entry.toMap());
+    } else {
+      // Throw an error if an entry with the same date exists
+      throw Exception('Diary Entry for this date already exists.');
+    }
   }
 
-  /// Removes a diary entry from Firestore.
-  Future<void> removeDiaryEntry(String id) async {
+  /// Removes a diary entry from Firestore. removing based on date
+  Future<void> removeDiaryEntry(DateTime date) async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('You must be logged in to remove a diary entry.');
     }
-    return await diaryEntriesCollection.doc(id).delete();
+    return await diaryEntriesCollection
+        .where('date', isEqualTo: date)
+        .get()
+        .then((snapshot) {
+      snapshot.docs.first.reference.delete();
+    });
   }
 
   /// Updates a diary entry in Firestore.
@@ -45,11 +61,22 @@ class DiaryEntryService {
     if (user == null) {
       throw Exception('You must be logged in to view diary entries.');
     }
+
     return diaryEntriesCollection
-        .orderBy('timestamp', descending: true)
+        .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiaryEntry.fromMap(doc)).toList());
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        return DiaryEntry(
+          id: doc.id,
+          date: data['date'].toDate(),
+          description: data['description'] ?? '',
+          rating: data['rating'] ?? 0,
+        );
+      }).toList();
+    });
   }
 
   /// Returns a stream of a list of diary entries for the current user for the given month.
@@ -64,11 +91,22 @@ class DiaryEntryService {
         DateTime(year, month + 1, 1).subtract(Duration(days: 1));
 
     return diaryEntriesCollection
-        .where('timestamp',
+        .where('date',
             isGreaterThanOrEqualTo: firstDayOfMonth,
             isLessThanOrEqualTo: lastDayOfMonth)
+        .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiaryEntry.fromMap(doc)).toList());
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        return DiaryEntry(
+          id: doc.id,
+          date: data['date'].toDate(),
+          description: data['description'] ?? '',
+          rating: data['rating'] ?? 0,
+        );
+      }).toList();
+    });
   }
 }
