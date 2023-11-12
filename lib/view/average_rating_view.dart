@@ -27,10 +27,19 @@ class _AverageRatingViewState extends State<AverageRatingView> {
       for (var entry in entries) {
         final dateFormat = DateFormat('yyyy-MM');
         final month = dateFormat.format(entry.date);
-        if (averageRatings.containsKey(month)) {
-          averageRatings[month] = (averageRatings[month]! + entry.rating) / 2.0;
-        } else {
-          averageRatings[month] = entry.rating.toDouble();
+        final rating = entry.rating;
+
+        // Check if rating is a finite number and not NaN
+        if (rating.isFinite && !rating.isNaN) {
+          if (averageRatings.containsKey(month)) {
+            // Check if the new value is finite before updating
+            final newAverage = (averageRatings[month]! + rating) / 2.0;
+            if (newAverage.isFinite) {
+              averageRatings[month] = newAverage;
+            }
+          } else {
+            averageRatings[month] = rating.toDouble();
+          }
         }
       }
 

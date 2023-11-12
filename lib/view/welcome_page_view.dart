@@ -53,7 +53,7 @@ class WelcomePageView extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (context) => AverageRatingView()));
               },
-              child: const Text('Show Average Rating of Months',
+              child: const Text('Statistics & Insights',
                   style: TextStyle(fontSize: 18)),
             ),
           ],
