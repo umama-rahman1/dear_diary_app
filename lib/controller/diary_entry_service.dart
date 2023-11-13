@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 
 class DiaryEntryService {
   final User? user = FirebaseAuth.instance.currentUser;
@@ -80,6 +79,7 @@ class DiaryEntryService {
           date: data['date'].toDate(),
           description: data['description'] ?? '',
           rating: data['rating'] ?? 0,
+          imageUrl: data['imageUrl'] ?? '',
         );
       }).toList();
     });
@@ -110,6 +110,7 @@ class DiaryEntryService {
           date: data['date'].toDate(),
           description: data['description'] ?? '',
           rating: data['rating'] ?? 0,
+          imageUrl: data['imageUrl'] ?? '',
         );
       }).toList();
     });
@@ -120,7 +121,7 @@ class DiaryEntryService {
     if (image == null) return null;
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return null;
-    
+
     // Define a reference in Firebase Storage where we want to upload the image.
     // We are organizing images in a folder named by the user's UID, and the image is named af
     final firebaseStorageRef = FirebaseStorage.instance

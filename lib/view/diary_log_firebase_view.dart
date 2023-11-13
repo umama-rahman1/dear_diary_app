@@ -217,6 +217,15 @@ class _DiaryLogViewState extends State<DiaryLogFirebaseView> {
                   fontSize: 15,
                 ),
               ),
+              if (entry.imageUrl != '') ...[
+                SizedBox(height: 8.0),
+                Image.network(
+                  entry.imageUrl!,
+                  width: double.infinity,
+                  height: 400,
+                  fit: BoxFit.contain,
+                ),
+              ],
             ],
           ),
         ),
