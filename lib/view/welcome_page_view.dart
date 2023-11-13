@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-// import 'diary_log_view.dart';
 import 'average_rating_view.dart';
 import 'diary_log_firebase_view.dart';
 
@@ -12,7 +11,6 @@ class WelcomePageView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Welcome to Dear Diary App'),
-        // button to sign out and go to login page
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -34,11 +32,9 @@ class WelcomePageView extends StatelessWidget {
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                // Handle Default List View button click
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        // builder: (context) => const DiaryLogView()));
                         builder: (context) => DiaryLogFirebaseView()));
               },
               child: const Text('Default List View',
@@ -47,7 +43,6 @@ class WelcomePageView extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Handle Show Average Rating of Months button click
                 Navigator.push(
                     context,
                     MaterialPageRoute(

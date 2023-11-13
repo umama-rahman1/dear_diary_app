@@ -13,7 +13,6 @@ class DiaryEntryView extends StatefulWidget {
 }
 
 class _DiaryEntryViewState extends State<DiaryEntryView> {
-  // final DiaryController _diaryController = DiaryController();
   final DiaryEntryService _diaryEntryService = DiaryEntryService();
   DateTime selectedDate = DateTime.now();
   int selectedRating = 5;

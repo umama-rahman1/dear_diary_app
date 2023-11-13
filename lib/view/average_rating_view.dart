@@ -61,7 +61,7 @@ class _AverageRatingViewState extends State<AverageRatingView> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 35.0), // Add desired height above the chart
+          SizedBox(height: 35.0),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -94,7 +94,7 @@ class _AverageRatingViewState extends State<AverageRatingView> {
                         return sortedMonths[value.toInt()];
                       },
                     ),
-                    topTitles: SideTitles(showTitles: false), // Hide top titles
+                    topTitles: SideTitles(showTitles: false),
                   ),
                   borderData: FlBorderData(show: true),
                 ),
