@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
 
-/// A service class that provides methods to perform CRUD operations
-/// on user's cars stored in Firestore.
 class DiaryEntryService {
   final User? user = FirebaseAuth.instance.currentUser;
   final CollectionReference diaryEntriesCollection;
@@ -20,15 +18,12 @@ class DiaryEntryService {
       throw Exception('You must be logged in to add a diary entry.');
     }
 
-    // Check if an entry with the same date already exists
     QuerySnapshot<Object?> existingEntries =
         await diaryEntriesCollection.where('date', isEqualTo: entry.date).get();
 
     if (existingEntries.docs.isEmpty) {
-      // Add the entry if no entry with the same date exists
       return await diaryEntriesCollection.add(entry.toMap());
     } else {
-      // Throw an error if an entry with the same date exists
       throw Exception('Diary Entry for this date already exists.');
     }
   }
@@ -54,15 +49,12 @@ class DiaryEntryService {
       throw Exception('You must be logged in to update a diary entry.');
     }
 
-    // Check if an entry with the same date already exists
     QuerySnapshot<Object?> existingEntries =
         await diaryEntriesCollection.where('date', isEqualTo: entry.date).get();
 
     if (existingEntries.docs.isNotEmpty) {
-      // If an entry with the same date exists, update its content
       return await existingEntries.docs.first.reference.update(entry.toMap());
     } else {
-      // If no entry with the same date exists, throw an error
       throw Exception('Diary Entry for this date does not exist.');
     }
   }
@@ -96,7 +88,6 @@ class DiaryEntryService {
       throw Exception('You must be logged in to view diary entries.');
     }
 
-    // Get the first and last timestamps of the month
     DateTime firstDayOfMonth = DateTime(year, month, 1);
     DateTime lastDayOfMonth =
         DateTime(year, month + 1, 1).subtract(Duration(days: 1));
