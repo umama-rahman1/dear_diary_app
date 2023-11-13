@@ -43,37 +43,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
               },
             ),
             const SizedBox(height: 16.0),
-            Row(
-              children: [
-                const Text('Select Date:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    )),
-                TextButton(
-                  onPressed: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(now.year, now.month, now.day),
-                    );
-                    if (pickedDate != null && pickedDate != selectedDate) {
-                      setState(() {
-                        selectedDate = pickedDate;
-                      });
-                    }
-                  },
-                  child: const Text('Choose Date',
-                      style: TextStyle(
-                        fontSize: 17,
-                      )),
-                ),
-                Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal()),
-                    style: TextStyle(
-                      fontSize: 17,
-                    )),
-              ],
-            ),
+            _buildDatePicker(),
             const SizedBox(height: 16.0),
             _buildRatingDropdown(),
             _buildImagePickerButton(),
@@ -104,6 +74,40 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return Row(
+      children: [
+        const Text('Select Date:',
+            style: TextStyle(
+              fontSize: 20,
+            )),
+        TextButton(
+          onPressed: () async {
+            final pickedDate = await showDatePicker(
+              context: context,
+              initialDate: selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(now.year, now.month, now.day),
+            );
+            if (pickedDate != null && pickedDate != selectedDate) {
+              setState(() {
+                selectedDate = pickedDate;
+              });
+            }
+          },
+          child: const Text('Choose Date',
+              style: TextStyle(
+                fontSize: 17,
+              )),
+        ),
+        Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal()),
+            style: const TextStyle(
+              fontSize: 17,
+            )),
+      ],
     );
   }
 
