@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_entry_service.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 DateTime now = DateTime.now();
@@ -15,6 +16,8 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
   DateTime selectedDate = DateTime.now();
   int selectedRating = 5;
   final TextEditingController diaryTextController = TextEditingController();
+  XFile? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -40,63 +43,10 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
               },
             ),
             const SizedBox(height: 16.0),
-            Row(
-              children: [
-                const Text('Select Date:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    )),
-                TextButton(
-                  onPressed: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(now.year, now.month, now.day),
-                    );
-                    if (pickedDate != null && pickedDate != selectedDate) {
-                      setState(() {
-                        selectedDate = pickedDate;
-                      });
-                    }
-                  },
-                  child: const Text('Choose Date',
-                      style: TextStyle(
-                        fontSize: 17,
-                      )),
-                ),
-                Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal()),
-                    style: TextStyle(
-                      fontSize: 17,
-                    )),
-              ],
-            ),
+            _buildDatePicker(),
             const SizedBox(height: 16.0),
-            Row(
-              children: [
-                const Text('Rating: ',
-                    style: TextStyle(
-                      fontSize: 20,
-                    )),
-                DropdownButton<int>(
-                  value: selectedRating,
-                  items: List.generate(5, (index) {
-                    return DropdownMenuItem<int>(
-                      value: index + 1,
-                      child: Text((index + 1).toString(),
-                          style: TextStyle(
-                            fontSize: 17,
-                          )),
-                    );
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedRating = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
+            _buildRatingDropdown(),
+            _buildImagePickerButton(),
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
@@ -125,6 +75,97 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
         ),
       ),
     );
+  }
+
+  Widget _buildDatePicker() {
+    return Row(
+      children: [
+        const Text('Select Date:',
+            style: TextStyle(
+              fontSize: 20,
+            )),
+        TextButton(
+          onPressed: () async {
+            final pickedDate = await showDatePicker(
+              context: context,
+              initialDate: selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(now.year, now.month, now.day),
+            );
+            if (pickedDate != null && pickedDate != selectedDate) {
+              setState(() {
+                selectedDate = pickedDate;
+              });
+            }
+          },
+          child: const Text('Choose Date',
+              style: TextStyle(
+                fontSize: 17,
+              )),
+        ),
+        Text(DateFormat('dd-MM-yyyy').format(selectedDate.toLocal()),
+            style: const TextStyle(
+              fontSize: 17,
+            )),
+      ],
+    );
+  }
+
+  Widget _buildRatingDropdown() {
+    return Row(
+      children: [
+        const Text('Rating: ', style: TextStyle(fontSize: 20)),
+        DropdownButton<int>(
+          value: selectedRating,
+          items: List.generate(5, (index) {
+            return DropdownMenuItem<int>(
+              value: index + 1,
+              child: Text(
+                (index + 1).toString(),
+                style: TextStyle(fontSize: 17),
+              ),
+            );
+          }),
+          onChanged: (value) {
+            setState(() {
+              selectedRating = value!;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  // widget to build button for uploading image from gallery and camera
+  Widget _buildImagePickerButton() {
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: () => _pickImageFromGallery(),
+          child: const Text('Pick Image from Gallery'),
+        ),
+        const SizedBox(width: 16.0),
+        ElevatedButton(
+          onPressed: () => _pickImageFromCamera(),
+          child: const Text('Pick Image from Camera'),
+        ),
+      ],
+    );
+  }
+
+  // Image picker methods
+  Future<void> _pickImageFromGallery() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image;
+    });
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    setState(() {
+      _image = image;
+    });
   }
 
   @override
