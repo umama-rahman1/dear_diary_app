@@ -70,14 +70,8 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
   }
 
   Future<void> _saveDiaryEntry(BuildContext context) async {
-    if (imageLink == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Image upload failed. Please try again.'),
-        ),
-      );
-      return;
-    }
+    // If imageLink is null, assign an empty string
+    imageLink ??= '';
 
     final entry = DiaryEntry(
       date: selectedDate,
