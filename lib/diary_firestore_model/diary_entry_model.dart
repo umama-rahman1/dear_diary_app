@@ -5,18 +5,21 @@ class DiaryEntry {
   final DateTime date;
   final String description;
   final int rating;
+  final String? imageUrl;
 
   DiaryEntry(
       {this.id,
       required this.date,
       required this.description,
-      required this.rating});
+      required this.rating,
+      this.imageUrl});
 
   Map<String, dynamic> toMap() {
     return {
       'date': date,
       'description': description,
       'rating': rating,
+      'imageUrl': imageUrl,
     };
   }
 
@@ -27,6 +30,7 @@ class DiaryEntry {
       date: map['date'].toDate(),
       description: map['description'] ?? '',
       rating: map['rating'] ?? 0,
+      imageUrl: map['imageUrl'] ?? '',
     );
   }
 }

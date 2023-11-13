@@ -1,11 +1,9 @@
-import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_entry_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:dear_diary_app/utils/utils.dart';
 
 DateTime now = DateTime.now();
 
@@ -21,6 +19,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
   final TextEditingController diaryTextController = TextEditingController();
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
+  String? imageLink;
 
   @override
   Widget build(BuildContext context) {
@@ -53,25 +52,14 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                final entry = DiaryEntry(
-                  date: selectedDate,
-                  description: diaryTextController.text,
-                  rating: selectedRating,
-                );
                 try {
-                  await _uploadImageToFirebase();
-                  await _diaryEntryService.addDiaryEntry(entry);
-                  Navigator.pop(
-                    context,
-                    'Entry Saved!',
-                  ); // Return to the Diary Log View after saving.
+                  imageLink =
+                      await _diaryEntryService.uploadImageToFirebase(_image);
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.toString()),
-                    ),
-                  );
+                  showSnackBar(context, e.toString());
+                  return;
                 }
+                await _saveDiaryEntry(context);
               },
               child: const Text('Save Entry'),
             ),
@@ -79,6 +67,34 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveDiaryEntry(BuildContext context) async {
+    if (imageLink == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Image upload failed. Please try again.'),
+        ),
+      );
+      return;
+    }
+
+    final entry = DiaryEntry(
+      date: selectedDate,
+      description: diaryTextController.text,
+      rating: selectedRating,
+      imageUrl: imageLink,
+    );
+
+    try {
+      await _diaryEntryService.addDiaryEntry(entry);
+      Navigator.pop(
+        context,
+        'Entry Saved!',
+      ); // Return to the Diary Log View after saving.
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
   }
 
   Widget _buildDatePicker() {
@@ -140,20 +156,23 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
     );
   }
 
-  // widget to build button for uploading image from gallery and camera
   Widget _buildImagePickerButton() {
-    return Column(
-      children: [
-        ElevatedButton(
-          onPressed: () => _pickImageFromGallery(),
-          child: const Text('Pick Image from Gallery'),
-        ),
-        const SizedBox(width: 16.0),
-        ElevatedButton(
-          onPressed: () => _pickImageFromCamera(),
-          child: const Text('Pick Image from Camera'),
-        ),
-      ],
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          //make this button galleryicon
+          ElevatedButton(
+            onPressed: () => _pickImageFromGallery(),
+            child: const Icon(Icons.photo_library),
+          ),
+          const SizedBox(width: 16.0),
+          ElevatedButton(
+            onPressed: () => _pickImageFromCamera(),
+            child: const Icon(Icons.camera_alt),
+          ),
+        ],
+      ),
     );
   }
 
@@ -170,34 +189,6 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
     setState(() {
       _image = image;
     });
-  }
-
-  Future<void> _uploadImageToFirebase() async {
-    // Check if the image is null (not selected). If so, return immediately.
-    if (_image == null) return;
-    // Retrieve the current logged-in user from Firebase Authentication.
-    final currentUser = FirebaseAuth.instance.currentUser;
-    // If there's no logged-in user, return immediately.
-    if (currentUser == null) return;
-    // Define a reference in Firebase Storage where we want to upload the image.
-    // We are organizing images in a folder named by the user's UID, and the image is named af
-    final firebaseStorageRef = FirebaseStorage.instance
-        .ref()
-        .child('images/${currentUser.uid}/${_image!.name}');
-    try {
-      // Start the upload process to Firebase Storage and wait for it to finish.
-      final uploadTask = await firebaseStorageRef.putFile(File(_image!.path));
-      // Check if the upload was successful.
-      if (uploadTask.state == TaskState.success) {
-        // If successful, get the download URL of the uploaded image and print it.
-        final downloadURL = await firebaseStorageRef.getDownloadURL();
-        print("Uploaded to: $downloadURL");
-      }
-    } catch (e) {
-      // Handle any errors that might occur during the upload process.
-      // Print the error message.
-      print("Failed to upload image: $e");
-    }
   }
 
   @override
