@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
 import 'package:dear_diary_app/controller/diary_entry_service.dart';
@@ -56,6 +59,7 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
                   rating: selectedRating,
                 );
                 try {
+                  await _uploadImageToFirebase();
                   await _diaryEntryService.addDiaryEntry(entry);
                   Navigator.pop(
                     context,
@@ -166,6 +170,34 @@ class _DiaryEntryViewState extends State<DiaryEntryView> {
     setState(() {
       _image = image;
     });
+  }
+
+  Future<void> _uploadImageToFirebase() async {
+    // Check if the image is null (not selected). If so, return immediately.
+    if (_image == null) return;
+    // Retrieve the current logged-in user from Firebase Authentication.
+    final currentUser = FirebaseAuth.instance.currentUser;
+    // If there's no logged-in user, return immediately.
+    if (currentUser == null) return;
+    // Define a reference in Firebase Storage where we want to upload the image.
+    // We are organizing images in a folder named by the user's UID, and the image is named af
+    final firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child('images/${currentUser.uid}/${_image!.name}');
+    try {
+      // Start the upload process to Firebase Storage and wait for it to finish.
+      final uploadTask = await firebaseStorageRef.putFile(File(_image!.path));
+      // Check if the upload was successful.
+      if (uploadTask.state == TaskState.success) {
+        // If successful, get the download URL of the uploaded image and print it.
+        final downloadURL = await firebaseStorageRef.getDownloadURL();
+        print("Uploaded to: $downloadURL");
+      }
+    } catch (e) {
+      // Handle any errors that might occur during the upload process.
+      // Print the error message.
+      print("Failed to upload image: $e");
+    }
   }
 
   @override
