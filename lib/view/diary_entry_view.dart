@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:dear_diary_app/model/diary_entry_model.dart';
 import 'package:dear_diary_app/diary_firestore_model/diary_entry_model.dart';
-// import 'package:dear_diary_app/controller/diary_controller.dart';
 import 'package:dear_diary_app/controller/diary_entry_service.dart';
 import 'package:intl/intl.dart';
 
