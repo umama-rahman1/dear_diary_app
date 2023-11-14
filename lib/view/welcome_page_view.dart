@@ -19,7 +19,6 @@ class WelcomePageView extends StatelessWidget {
               await FirebaseAuth.instance.signOut();
             },
           ),
-          DarkModeToggle(), // Include the DarkModeToggle widget here
         ],
       ),
       body: Center(
@@ -32,6 +31,17 @@ class WelcomePageView extends StatelessWidget {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Dark Mode Toggle',
+                  style: TextStyle(fontSize: 18),
+                ),
+                DarkModeToggle(),
+              ],
+            ), // Move the DarkModeToggle widget here
+            const SizedBox(height: 20), // Adjust the spacing as needed
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
