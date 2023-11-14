@@ -7,3 +7,11 @@ final ThemeData appTheme = ThemeData(
   visualDensity: VisualDensity.adaptivePlatformDensity,
   textTheme: GoogleFonts.deliusTextTheme(),
 );
+
+final ThemeData appThemeDark = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: Colors.blue,
+  scaffoldBackgroundColor: Colors.grey[900],
+  visualDensity: VisualDensity.adaptivePlatformDensity,
+  textTheme: GoogleFonts.deliusTextTheme(),
+);
