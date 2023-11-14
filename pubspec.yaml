@@ -24,6 +24,7 @@ dependencies:
   fl_chart: ^0.40.0
   image_picker: ^1.0.4
   firebase_storage: ^11.2.8
+  firebase_ui_oauth_google: ^1.2.14
 
 dev_dependencies:
   flutter_test:

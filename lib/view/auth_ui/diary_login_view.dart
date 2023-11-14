@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:dear_diary_app/view/welcome_page_view.dart';
 
 class DiaryLoginView extends StatelessWidget {
@@ -16,6 +16,9 @@ class DiaryLoginView extends StatelessWidget {
           return SignInScreen(
             providers: [
               EmailAuthProvider(),
+              GoogleProvider(
+                  clientId:
+                      "514543624727-59bjcqcknvvlitmji8qjmpsntjg27ucc.apps.googleusercontent.com")
             ],
             subtitleBuilder: (context, action) {
               return Padding(
